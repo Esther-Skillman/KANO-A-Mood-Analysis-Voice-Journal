@@ -1,6 +1,6 @@
 # KANO-A-Mood-Analysis-Voice-Journal
 
-###Project Title
+### Project Title
 KANO: A Mood Analysis Voice Journal
 
 ### Vision
