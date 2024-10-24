@@ -1,5 +1,10 @@
 # KANO-A-Mood-Analysis-Voice-Journal
 
-### KANO stands for 'Keep A New Outlook'. 
+###Project Title
+KANO: A Mood Analysis Voice Journal
 
-This Voice Journal will allow a user to gather emotional information on their voice entries, whether they sounded sad, happy or angry, for example, via the use of an AI mood analysis. Enabling them to reflect on the emotions they convey, providing a deeper insight into their overall well-being.
+### Vision
+KANO ('Keep A New Outlook')  will be a mood analysis voice journal that will use AI to discern the emotions of a person’s voice entry. Enabling them to reflect on the emotions they convey, providing a deeper and unbiased insight into their overall well-being.
+
+### Supervisor
+Vassilis Cutsuridis
