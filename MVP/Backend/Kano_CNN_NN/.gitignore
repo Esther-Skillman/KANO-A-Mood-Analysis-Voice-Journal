@@ -1,0 +1,14 @@
+# Ignore Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore virtual environment
+.venv/
+
+# Ignore PyCharm project files
+.idea/
+
+# Ignore system-specific
+.DS_Store   # macOS-specific
+Thumbs.db   # Windows-specific
