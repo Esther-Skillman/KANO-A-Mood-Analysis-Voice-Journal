@@ -24,3 +24,24 @@ for dirname, _, filenames in os.walk(r'G:\My Drive\Databases_FYP\CREMA-D'):
 print(paths[:5])
 
 print(labels[:5])
+
+# Create DataFrame
+df = pd.DataFrame()
+df['speech'] = paths
+df['label'] = labels
+
+# Map emotion codes to full labels
+emotion_map = {
+    'ang': 'anger',
+    'dis': 'disgust',
+    'fea': 'fear',
+    'hap': 'happy',
+    'neu': 'neutral',
+    'sad': 'sad'
+}
+
+df['label'] = df['label'].map(emotion_map)
+
+print(df.head())  # Check the first few rows
+
+print(df['label'].value_counts()) # Check number of labels
