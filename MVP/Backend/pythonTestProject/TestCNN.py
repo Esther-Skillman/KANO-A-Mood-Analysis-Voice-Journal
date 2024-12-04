@@ -4,9 +4,9 @@ import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
-from tensorflow.python.keras.utils.np_utils import to_categorical
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
+from tensorflow.keras.utils import to_categorical
 
 import os
 
