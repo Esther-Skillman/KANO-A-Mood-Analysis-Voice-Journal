@@ -98,13 +98,13 @@ df = df.dropna(subset=['features'])
 
 print("Dataset loading SUCCESS")
 
-print("Converting to arrays...")
+print("Extracting features and labels...")
 
 # Convert features and labels to NumPy arrays
 X = np.array(df['features'].tolist())  # Features
 y = pd.get_dummies(df['label']).values  # One-hot encoded labels
 
-print("Array conversion SUCCESS")
+print("Features and labels extraction SUCCESS")
 
 print("Fitting data for CNN model...")
 # Train-test split
@@ -173,6 +173,7 @@ history = model.fit(
     verbose=1  # Displays progress
 )
 print("Trained model SUCCESS")
+
 
 model.save('cnn_model40.h5') 
 print("Model saved as cnn_model40.h5")
