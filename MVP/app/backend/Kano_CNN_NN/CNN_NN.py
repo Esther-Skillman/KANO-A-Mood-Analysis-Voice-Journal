@@ -179,3 +179,5 @@ print("Evaluating model...")
 
 test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=0)
 print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+
+model.save('Kano_CNN_NN/cnn_model_40.h5')
