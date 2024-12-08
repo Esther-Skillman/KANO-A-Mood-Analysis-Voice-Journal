@@ -1,9 +1,5 @@
 # Import libraries
-# pip install resampy
-# pip install tensorflow
-# pip install librosa
-# pip install pandas
-# pip install matplotlib
+# pip install resampy tensorflow librosa pandas matplotlib
 
 import librosa
 from librosa import feature

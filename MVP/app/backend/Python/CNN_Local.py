@@ -1,9 +1,5 @@
 # Import libraries
-# pip install resampy
-# pip install tensorflow
-# pip install librosa
-# pip install pandas
-# pip install matplotlib
+# pip install resampy tensorflow librosa pandas matplotlib
 
 import librosa
 from librosa import feature
@@ -166,6 +162,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 
 print("CNN model build SUCCESS")
 
+print("Training model...")
 history = model.fit(
     X_train, y_train,
     validation_data=(X_test, y_test),
@@ -189,5 +186,4 @@ y_test_subset = pd.get_dummies(test_subset['label']).values
 
 test_loss, test_accuracy = model.evaluate(X_test_subset, y_test_subset, verbose=0)
 print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
-
 
