@@ -9,6 +9,9 @@ __pycache__/
 # Ignore PyCharm project files
 .idea/
 
+# Ignore Juypter Notebook Checkpoints
+.ipynb_checkpoints/
+
 # Ignore system-specific
 .DS_Store   # macOS-specific
 Thumbs.db   # Windows-specific
