@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: KANO-backend
+    volumes:
+      - ./backend/python:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: [ "python", "CNN_Lab.py" ]
