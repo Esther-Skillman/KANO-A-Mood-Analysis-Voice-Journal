@@ -4,7 +4,7 @@
 # pip install flask python-multipart
 
 import uvicorn
-from flask import Flask, request, jsonify
+# from flask import Flask, request, jsonify
 import librosa
 import numpy as np
 import tensorflow as tf
@@ -12,11 +12,18 @@ from tensorflow import keras
 import os
 import tempfile
 from sklearn.preprocessing import MinMaxScaler
-from werkzeug.utils import secure_filename
+# from werkzeug.utils import secure_filename
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse
+import io
+import matplotlib.pyplot as plt
+# from main import split_audio_to_chunks, predict_emotion_for_chunks
 
 # Load CNN model
 MODEL_PATH = r"C:\KANO-A-Mood-Analysis-Voice-Journal\MVP\app\backend\API\cnn_model_test.keras" # Replace with absoloute path
 model = tf.keras.models.load_model(MODEL_PATH)
+
+split_chunk_duration = 6 # In seconds
 
 emotion_map = {
     0: 'anger',
@@ -49,7 +56,7 @@ def extract_mfcc(audio, sample_rate, n_mfcc=40, max_pad_len=256):
         print(f"Error processing audio data: {e}")
         return None
     
-def split_audio_to_chunks(audio, sample_rate, chunk_duration=3): # In seconds
+def split_audio_to_chunks(audio, sample_rate, chunk_duration=split_chunk_duration):
     # audio, sample_rate = librosa.load(file_path, sr=None)
 
     total_duration = librosa.get_duration(y=audio, sr=sample_rate)
@@ -72,18 +79,13 @@ def predict_emotion_for_chunks(chunks, sample_rate):
             mfcc = np.expand_dims(mfcc, axis=0)
             mfcc = np.expand_dims(mfcc, axis=-1)
             prediction = model.predict(mfcc)
+            print(f"Single chunk predictions: {prediction}")
             emotion_index = np.argmax(prediction)
             emotion_name = emotion_map[emotion_index]
             print(f"Chunk Emotion: {emotion_name}")
             emotions.append(emotion_name)
             
     return emotions
-
-from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import JSONResponse
-import io
-import matplotlib.pyplot as plt
-# from main import split_audio_to_chunks, predict_emotion_for_chunks
 
 app = FastAPI()
 
