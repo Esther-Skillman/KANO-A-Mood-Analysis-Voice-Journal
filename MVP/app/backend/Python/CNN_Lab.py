@@ -1,23 +1,39 @@
 # Import libraries
-# pip install resampy tensorflow librosa pandas matplotlib
+# KERNEL SETUP IN VS CODE:
+# conda create -n myenv python=3.12.2
+# conda activate myenv 
+# OPTIONAL (usually prompted):
+# conda install jupyter
 
+# %pip install resampy tensorflow librosa pandas matplotlib kagglehub
+# %pip install resampy tf_keras librosa pandas matplotlib kagglehub
+
+import kagglehub
 import librosa
 from librosa import feature
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
-from tensorflow.python.keras.utils.np_utils import to_categorical
-
+from sklearn.preprocessing import MinMaxScaler
+# from tensorflow.python.keras.models import Sequential
+# from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
+# from tensorflow.python.keras.utils.np_utils import to_categorical
+from tf_keras.models import Sequential
+from tf_keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization
+from tf_keras.utils import to_categorical
 import os
+
+# Download the CREMA-D dataset via kagglehub
+
+path = kagglehub.dataset_download("ejlok1/cremad")
+print("Path to dataset files:", path)
 
 # Load CREMA-D Dataset
 paths = []
 labels = []
 
-for dirname, _, filenames in os.walk(r'G:\My Drive\Databases_FYP\CREMA-D'):
+for dirname, _, filenames in os.walk(path):
     for filename in filenames:
         if filename.endswith('.wav'):
             paths.append(os.path.join(dirname, filename))
@@ -49,7 +65,6 @@ print(df.head())  # Check the first few rows
 
 print(df['label'].value_counts()) # Check number of labels
 
-
 # Function to extract MFCCs
 print("Extracting MFCCs...")
 def extract_mfcc(file_path, n_mfcc=40, max_pad_len=256): # 256 * (512 / 22050) <= 6 seconds
@@ -79,7 +94,12 @@ def extract_mfcc(file_path, n_mfcc=40, max_pad_len=256): # 256 * (512 / 22050) <
             mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
         else:
             mfcc = mfcc[:, :max_pad_len]
-        return mfcc
+    
+        # Normalise MFCCs using Min-Max scaling
+        scaler = MinMaxScaler(feature_range=(0,1))
+        mfcc_normalised = scaler.fit_transform(mfcc.T).T # Normalise across time
+
+        return mfcc_normalised
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
         return None
@@ -94,6 +114,7 @@ df = df.dropna(subset=['features'])
 
 print("Dataset loading SUCCESS")
 
+
 print("Extracting features and labels...")
 
 # Convert features and labels to NumPy arrays
@@ -101,6 +122,7 @@ X = np.array(df['features'].tolist())  # Features
 y = pd.get_dummies(df['label']).values  # One-hot encoded labels
 
 print("Features and labels extraction SUCCESS")
+
 
 print("Fitting data for CNN model...")
 # Train-test split
@@ -118,26 +140,32 @@ model = Sequential()
 print("Building CNN model...")
 # Add convolutional layers
 model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(40, 256, 1)))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+#model.add(Conv2D(256, kernel_size=(3, 3), activation='relu'))
+#model.add(MaxPooling2D(pool_size=(2, 2)))
+
 # Explanation:
+# Progressive increase of filters
 # - 32 filters (patterns the network learns)
 # - kernel_size=(3,3): Each filter is a 3x3 sliding window.
 # - activation='relu': Introduces non-linearity, making the model learn complex patterns.
-# - input_shape=(40, 862, 1): Input dimensions—40 MFCCs, 256 time frames, 1 channel.
-
-model.add(MaxPooling2D(pool_size=(2, 2)))
-# Explanation:
+# - input_shape=(40, 256, 1): Input dimensions—40 MFCCs, 256 time frames, 1 channel.
 # - Reduces dimensionality by taking the max value in 2x2 regions.
 # - Makes the model computationally efficient and reduces overfitting.
-
-# Add more convolutional and pooling layers
-model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
 
 # Flatten the 2D outputs into a 1D vector
 model.add(Flatten())
 
 # Add dense (fully connected) layers
-model.add(Dense(128, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+
 # Explanation:
 # - Fully connected layer with 128 neurons to learn high-level features.
 model.add(Dropout(0.5))
@@ -164,20 +192,16 @@ print("Training model...")
 history = model.fit(
     X_train, y_train,
     validation_data=(X_test, y_test),
-    epochs=20,  # Number of passes through the dataset
+    epochs=15,  # Number of passes through the dataset
     batch_size=32,  # Number of samples per gradient update
     verbose=1  # Displays progress
 )
 print("Trained model SUCCESS")
 
+model.save('cnn_model_test.keras') 
+print("Model saved as cnn_model_test.keras")
 
-model.save('cnn_model40.h5') 
-print("Model saved as cnn_model40.h5")
-
-# Evaluate the model on test data
 print("Evaluating model...")
 
 test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=0)
 print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
-
-
