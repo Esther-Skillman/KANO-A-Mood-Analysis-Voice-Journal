@@ -6,7 +6,7 @@
 # conda install jupyter
 
 # %pip install resampy tensorflow librosa pandas matplotlib kagglehub
-# %pip install resampy tf_keras librosa pandas matplotlib kagglehub
+%pip install resampy tf_keras tensorflow librosa pandas matplotlib kagglehub
 
 import kagglehub
 import librosa
@@ -16,13 +16,15 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-# from tensorflow.python.keras.models import Sequential
-# from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
-# from tensorflow.python.keras.utils.np_utils import to_categorical
-from tf_keras.models import Sequential
-from tf_keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization
-from tf_keras.utils import to_categorical
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, Input
+from tensorflow.keras.utils import to_categorical
+#from tf_keras.models import Sequential
+#from tf_keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, BatchNormalization, Input
+#from tf_keras.utils import to_categorical
 import os
+
 
 # Download the CREMA-D dataset via kagglehub
 

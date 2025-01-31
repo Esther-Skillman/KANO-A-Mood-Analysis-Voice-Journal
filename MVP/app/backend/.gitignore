@@ -14,4 +14,7 @@ __pycache__/
 
 # Ignore system-specific
 .DS_Store   # macOS-specific
-Thumbs.db   # Windows-specific
+Thumbs.db   # Windows-specifics
+
+# Ignore CNN .keras models
+*.keras

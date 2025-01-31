@@ -1,7 +1,7 @@
 # pip install fastapi
 # uvicorn FastAPI:app --reload
 
-# pip install flask
+# pip install flask python-multipart
 
 from flask import Flask, request, jsonify
 import librosa
@@ -13,8 +13,9 @@ from sklearn.preprocessing import MinMaxScaler
 from werkzeug.utils import secure_filename
 
 # Load CNN model
+#print(os.path.abspath("cnn_model_test.keras"))
 MODEL_PATH = "cnn_model_test.keras"
-model = tf.keras.models.load_model(MODEL_PATH)
+model = tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 def extract_mfcc(file_path, n_mfcc=40, max_pad_len=256):
     try:
