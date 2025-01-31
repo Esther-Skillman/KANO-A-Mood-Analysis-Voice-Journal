@@ -32,8 +32,8 @@ def extract_mfcc(audio, sample_rate, n_mfcc=40, max_pad_len=256):
         # audio, sample_rate = librosa.load(file_path, res_type='kaiser_fast')
 
         mfcc = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=n_mfcc)
-        print(f"MFCC Shape: {mfcc.shape}")
-        print(f"First few MFCC values: {mfcc[:, :5]}")
+        #print(f"MFCC Shape: {mfcc.shape}")
+        #print(f"First few MFCC values: {mfcc[:, :5]}")
 
         if mfcc.shape[1] < max_pad_len:
             pad_width = max_pad_len - mfcc.shape[1]
@@ -43,13 +43,13 @@ def extract_mfcc(audio, sample_rate, n_mfcc=40, max_pad_len=256):
 
         scaler = MinMaxScaler(feature_range=(0, 1))
         mfcc_normalised = scaler.fit_transform(mfcc.T).T 
-        print(f"MFCC Normalised: {mfcc_normalised}")
+        #print(f"MFCC Normalised: {mfcc_normalised}")
         return mfcc_normalised
     except Exception as e:
         print(f"Error processing audio data: {e}")
         return None
     
-def split_audio_to_chunks(audio, sample_rate, chunk_duration=6): # In seconds
+def split_audio_to_chunks(audio, sample_rate, chunk_duration=3): # In seconds
     # audio, sample_rate = librosa.load(file_path, sr=None)
 
     total_duration = librosa.get_duration(y=audio, sr=sample_rate)
@@ -63,18 +63,20 @@ def split_audio_to_chunks(audio, sample_rate, chunk_duration=6): # In seconds
     return chunks
 
 def predict_emotion_for_chunks(chunks, sample_rate):
-    print(f"Chunks and sample_rate: {chunks} + {sample_rate}")
+    #print(f"Chunks and sample_rate: {chunks} + {sample_rate}")
     emotions = []
     for chunk in chunks:
         mfcc = extract_mfcc(chunk, sample_rate)
-        print(f"MFCC: {mfcc}")
+        #print(f"MFCC: {mfcc}")
         if mfcc is not None:
             mfcc = np.expand_dims(mfcc, axis=0)
             mfcc = np.expand_dims(mfcc, axis=-1)
             prediction = model.predict(mfcc)
             emotion_index = np.argmax(prediction)
             emotion_name = emotion_map[emotion_index]
+            print(f"Chunk Emotion: {emotion_name}")
             emotions.append(emotion_name)
+            
     return emotions
 
 from fastapi import FastAPI, UploadFile, File
@@ -99,13 +101,13 @@ async def predict_emotions(file: UploadFile = File(...)):
         plt.plot(audio)
         plt.title("Audio Waveform")
         plt.show()
-        print(f"Audio Extracted: {audio}")
-        print(f"Sample Rate Extracted: {sample_rate}")
+        #print(f"Audio Extracted: {audio}")
+        #print(f"Sample Rate Extracted: {sample_rate}")
 
         chunks = split_audio_to_chunks(audio, sample_rate)
-        print(f"Chunks list: {chunks}")
+        #print(f"Chunks list: {chunks}")
         chunk_predictions = predict_emotion_for_chunks(chunks, sample_rate)
-        print(f"Chunk predictions: {chunk_predictions}")
+        print(f"Overall chunk predictions: {chunk_predictions}")
 
         total_chunks = len(chunk_predictions)
         emotion_counts = {emotion: chunk_predictions.count(emotion) for emotion in set(chunk_predictions)}
