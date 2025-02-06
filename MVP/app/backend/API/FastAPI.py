@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 MODEL_PATH = r"C:\KANO-A-Mood-Analysis-Voice-Journal\MVP\app\backend\API\cnn_model_test.keras" # Replace with absoloute path
 model = tf.keras.models.load_model(MODEL_PATH)
 
-split_chunk_duration = 6 # In seconds
+split_chunk_duration = 1 # In seconds
 
 emotion_map = {
     0: 'anger',
