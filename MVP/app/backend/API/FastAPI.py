@@ -18,12 +18,15 @@ from fastapi.responses import JSONResponse
 import io
 import matplotlib.pyplot as plt
 # from main import split_audio_to_chunks, predict_emotion_for_chunks
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+scaler = StandardScaler()
 
 # Load CNN model
-MODEL_PATH = r"C:\KANO-A-Mood-Analysis-Voice-Journal\MVP\app\backend\API\cnn_model_test.keras" # Replace with absoloute path
+MODEL_PATH = r"C:\KANO-A-Mood-Analysis-Voice-Journal\MVP\app\backend\API\93_model.keras" # Replace with absoloute path
 model = tf.keras.models.load_model(MODEL_PATH)
 
-split_chunk_duration = 1 # In seconds
+split_chunk_duration = 2.5 # In seconds
 
 emotion_map = {
     0: 'anger',
@@ -33,7 +36,7 @@ emotion_map = {
     4: 'neutral',
     5: 'sad'
 }
-
+""""
 def extract_mfcc(audio, sample_rate, n_mfcc=40, max_pad_len=256):
     try:
         # audio, sample_rate = librosa.load(file_path, res_type='kaiser_fast')
@@ -54,6 +57,31 @@ def extract_mfcc(audio, sample_rate, n_mfcc=40, max_pad_len=256):
         return mfcc_normalised
     except Exception as e:
         print(f"Error processing audio data: {e}")
+        return None"""
+
+n_mels = 128
+n_fft = 2048
+hop_length = 512
+fmax = 8000
+
+def mel_spectogram(data, sr, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels, max_shape=(128, 128)):
+    try: 
+        mel_spec = librosa.feature.melspectrogram(y=data, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels, fmax=fmax)
+        log_mel_spec = librosa.power_to_db(mel_spec, ref=np.max) # =np.max normalised relative to the most intense value
+
+        log_mel_spec = librosa.util.fix_length(log_mel_spec, size=max_shape[0], axis=0)
+        log_mel_spec = librosa.util.fix_length(log_mel_spec, size=max_shape[1], axis=1)
+
+        # Reshape the feature to 2D (flatten it), standardise it, and then reshape it back
+        mel_reshaped = log_mel_spec.reshape(-1, log_mel_spec.shape[-1])
+        mel_standardised = scaler.fit_transform(mel_reshaped) 
+        
+        mel_standardised = mel_standardised.reshape(log_mel_spec.shape)
+
+        print(f"Mel Shape {mel_standardised.shape}")
+        return mel_standardised
+    except Exception as e:
+        print(f"Error processing audio data: {e}")
         return None
     
 def split_audio_to_chunks(audio, sample_rate, chunk_duration=split_chunk_duration):
@@ -66,18 +94,18 @@ def split_audio_to_chunks(audio, sample_rate, chunk_duration=split_chunk_duratio
         end = min(start + chunk_duration, total_duration)
         chunk = audio[int(start * sample_rate):int(end * sample_rate)]
         chunks.append(chunk)
-
+    print(f"Chunks Processed: {chunks[:1]}")
     return chunks
 
 def predict_emotion_for_chunks(chunks, sample_rate):
     #print(f"Chunks and sample_rate: {chunks} + {sample_rate}")
     emotions = []
     for chunk in chunks:
-        mfcc = extract_mfcc(chunk, sample_rate)
+        mfcc = mel_spectogram(chunk, sample_rate)
         #print(f"MFCC: {mfcc}")
         if mfcc is not None:
-            mfcc = np.expand_dims(mfcc, axis=0)
-            mfcc = np.expand_dims(mfcc, axis=-1)
+            #mfcc = np.expand_dims(mfcc, axis=0)
+            #mfcc = np.expand_dims(mfcc, axis=-1)
             prediction = model.predict(mfcc)
             print(f"Single chunk predictions: {prediction}")
             emotion_index = np.argmax(prediction)
