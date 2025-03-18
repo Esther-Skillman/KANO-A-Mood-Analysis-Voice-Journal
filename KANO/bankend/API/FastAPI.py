@@ -20,10 +20,20 @@ import matplotlib.pyplot as plt
 # from main import split_audio_to_chunks, predict_emotion_for_chunks
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from collections import Counter
+from fastapi.middleware.cors import CORSMiddleware
 
 scaler = StandardScaler()
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or replace with specific origins like ['http://localhost:8000']
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
 # Load CNN model
 MODEL_PATH = r"C:\Repos\KANO-A-Mood-Analysis-Voice-Journal\KANO\Models\93_model.keras"
