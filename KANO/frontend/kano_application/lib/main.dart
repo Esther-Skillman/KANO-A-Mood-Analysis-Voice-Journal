@@ -62,7 +62,7 @@ class _HomeState extends State<Home> {
       showChart = false;
     });
 
-    var url = Uri.parse('http://127.0.0.1:8000/predict_simple/');
+    var url = Uri.parse('https://kanoanalysis.me/predict_simple/');
     var request = http.MultipartRequest('POST', url);
 
     if (file is File) {

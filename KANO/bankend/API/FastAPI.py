@@ -29,14 +29,14 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or replace with specific origins like ['http://localhost:8000']
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],  
 )
 
 # Load CNN model
-MODEL_PATH = r"C:\Repos\KANO-A-Mood-Analysis-Voice-Journal\KANO\Models\93_model.keras"
+MODEL_PATH = r"C:\Repos\KANO-A-Mood-Analysis-Voice-Journal\KANO\Models\K_Fold_94.keras"
 model = tf.keras.models.load_model(MODEL_PATH)
 
 emotion_labels = ['Anger', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Suprise']
