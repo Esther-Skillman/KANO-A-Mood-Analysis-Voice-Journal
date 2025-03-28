@@ -76,32 +76,54 @@ def calculate_emotion_percentages(predictions):
     return percentages
 
 @app.post("/predict_graph/")
-async def predict(file: UploadFile = File(...)):
+async def predict_graph(file: UploadFile = File(...)):
+    filename = file.filename
+    print(f"Processing file: {filename}")
+
+    # Extract expected emotion from filename
+    try:
+        expected_emotion_code = filename.split('_')[2]  # Example: 'ANG'
+        emotion_map = {
+            'ANG': 'Anger',
+            'DIS': 'Disgust',
+            'FEA': 'Fear',
+            'HAP': 'Happy',
+            'NEU': 'Neutral',
+            'SAD': 'Sad',
+            'SUR': 'Suprise'
+        }
+        expected_emotion = emotion_map.get(expected_emotion_code, "Unknown")
+    except Exception as e:
+        expected_emotion = "Unknown"
+        print(f"Could not extract expected emotion: {e}")
+
     audio_data, sr = librosa.load(file.file, sr=None)
 
-    audio_length = len(audio_data) / sr
-    print(f"Audio length: {audio_length} seconds")
-
     segment_lengths = [x * 0.25 for x in range(8, 21)]  # 2 to 5 in 0.25 second increments
-
     emotion_results = {}
 
     for segment_length in segment_lengths:
         print(f"Processing segment length: {segment_length} seconds")
-
         predictions = predict_emotion(audio_data, sr, segment_length)
         percentages = calculate_emotion_percentages(predictions)
         emotion_results[segment_length] = percentages
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Use the predicted emotion from the 2.5-second segment
+    segment_results = emotion_results.get(2.5, {})
+    predicted_emotion = max(segment_results, key=segment_results.get, default="Unknown")
 
+    is_correct = expected_emotion == predicted_emotion
+    print(f"Expected: {expected_emotion}, Predicted (2.5s): {predicted_emotion}, Correct: {is_correct}")
+
+    # Plot results
+    fig, ax = plt.subplots(figsize=(10, 6))
     for emotion in emotion_labels:
         emotion_percentages = [emotion_results[segment_length].get(emotion, 0) for segment_length in segment_lengths]
         ax.plot(segment_lengths, emotion_percentages, label=emotion)
 
     ax.set_xlabel('Segment Length (seconds)')
     ax.set_ylabel('Emotion Percentage (%)')
-    ax.set_title('Emotion Distribution Across Different Segment Lengths')
+    ax.set_title(f'Emotion Distribution for {filename}\nExpected: {expected_emotion} | Predicted (2.5s): {predicted_emotion} ({is_correct})')
     ax.legend()
 
     buf = io.BytesIO()
@@ -109,6 +131,7 @@ async def predict(file: UploadFile = File(...)):
     buf.seek(0)
 
     return StreamingResponse(buf, media_type="image/png")
+
 
 @app.post("/predict_simple/")
 async def predict(file: UploadFile = File(...)):
