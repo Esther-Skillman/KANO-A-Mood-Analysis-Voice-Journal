@@ -295,3 +295,184 @@ print(np_features.shape)
 
 import multiprocessing as mp
 print("Number of processors: ", mp.cpu_count())
+
+from joblib import Parallel, delayed
+import timeit
+import numpy as np
+import librosa.util
+from tqdm import tqdm
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from tensorflow.keras.utils import to_categorical
+
+scaler = StandardScaler()
+
+def tqdm_parallel(iterable, total):
+    for item in tqdm(iterable, total=total, desc="Processing Audio Files"):
+        yield item
+
+
+# Function to extract and process features
+def process_feature(path, emotion, max_shape=(128, 128)):  
+    features = get_features(path)  
+    X = []  
+    Y = []  
+
+    for feature in features:
+        # Fix length of mel
+        feature = librosa.util.fix_length(feature, size=max_shape[0], axis=0)
+        feature = librosa.util.fix_length(feature, size=max_shape[1], axis=1)
+
+        # Reshape the feature to 2D (flatten it), standardise it, and then reshape it back
+        feature_reshaped = feature.reshape(-1, feature.shape[-1])
+        feature_standardized = scaler.fit_transform(feature_reshaped) 
+        
+        feature_standardized = feature_standardized.reshape(feature.shape)  # Reshape it back to original shape
+
+        X.append(feature_standardized)  
+        Y.append(emotion)  
+
+    return X, Y
+
+# Load data
+paths = emotion_data.paths  
+emotions = emotion_data.emotions  
+num_files = len(paths)  
+
+start = timeit.default_timer()
+
+# Parallel processing with tqdm
+results = Parallel(n_jobs=-1)(
+    delayed(process_feature)(path, emotion) for path, emotion in tqdm_parallel(zip(paths, emotions), total=num_files)
+)
+
+# Collect results
+X = []
+Y = []
+for result in results:
+    x, y = result
+    X.extend(x)
+    Y.extend(y)
+
+# Convert to NumPy arrays
+X = np.stack(X, axis=0)
+Y = np.array(Y)
+
+stop = timeit.default_timer()
+print(f'Time: {stop - start:.2f} seconds')
+
+# One-Hot Encoding
+label_encoder = LabelEncoder()
+Y_encoded = label_encoder.fit_transform(Y) 
+Y_one_hot = to_categorical(Y_encoded)  # Convert to one-hot encoding
+
+# Shape verification
+assert len(Y) == X.shape[0], "Mismatch: Number of labels does not match the number of samples!"
+print(f'Final X shape: {X.shape}')  # Expected (num_samples, 128, 128, 1)
+print(f'Final Y shape: {Y_one_hot.shape}')  # Expected (num_samples, num_classes)
+
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
+import numpy as np
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+# Train-test split (80-20 split)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y_one_hot, test_size=0.2, random_state=42, shuffle=True)
+
+# Validation split (10% of training data)
+X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.1, random_state=42)
+
+X_train.shape, Y_train.shape, X_test.shape, Y_test.shape
+
+# Convert to TensorFlow tensors
+X_train = tf.convert_to_tensor(X_train, dtype=tf.float32)
+X_val = tf.convert_to_tensor(X_val, dtype=tf.float32)
+X_test = tf.convert_to_tensor(X_test, dtype=tf.float32)
+
+Y_train = tf.convert_to_tensor(Y_train, dtype=tf.float32)
+Y_val = tf.convert_to_tensor(Y_val, dtype=tf.float32)
+Y_test = tf.convert_to_tensor(Y_test, dtype=tf.float32)
+
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Flatten, Dense, Dropout
+
+num_classes = Y_one_hot.shape[1]  # Number of emotion categories
+
+model = Sequential([
+    # Convolutional feature extraction
+    Conv2D(32, (3,3), activation='relu', padding='same', input_shape=(128, 128, 1)),
+    BatchNormalization(),
+    MaxPooling2D((2,2)),
+
+    Conv2D(64, (3,3), activation='relu', padding='same'),
+    BatchNormalization(),
+    MaxPooling2D((2,2)),
+
+    Conv2D(128, (3,3), activation='relu', padding='same'),
+    BatchNormalization(),
+    MaxPooling2D((2,2)),
+
+    # Conv2D(256, (3,3), activation='relu', padding='same'),
+    # BatchNormalization(),
+    # MaxPooling2D((2,2)),
+
+    # Flatten and Fully Connected Layers
+    Flatten(),
+    Dense(256, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.5),
+
+    Dense(128, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.5),
+
+    Dense(num_classes, activation='softmax') 
+])
+
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.summary()
+
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+
+model_checkpoint = ModelCheckpoint('best_model.keras', monitor='val_loss', save_best_only=True, verbose=1)
+
+early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True, verbose=1)
+
+lr_reduction = ReduceLROnPlateau(monitor='val_loss', patience=3, factor=0.5, min_lr=1e-5, verbose=1)
+
+# Train the CNN model
+history = model.fit(
+    X_train, Y_train,
+    validation_data=(X_val, Y_val),
+    epochs=50,
+    batch_size=64,
+    callbacks=[model_checkpoint, early_stop, lr_reduction]
+)
+
+test_loss, test_acc = model.evaluate(X_test, Y_test)
+print(f"Test Accuracy: {test_acc * 100:.2f}%")
+print(f"Test Lost: {test_loss:.4f}")
+
+
+stopped_epoch = early_stop.stopped_epoch
+
+epochs = [i for i in range(stopped_epoch+1)]
+fig , ax = plt.subplots(1,2)
+train_acc = history.history['accuracy']
+train_loss = history.history['loss']
+test_acc = history.history['val_accuracy']
+test_loss = history.history['val_loss']
+
+fig.set_size_inches(20,6)
+ax[0].plot(epochs , train_loss , label = 'Training Loss')
+ax[0].plot(epochs , test_loss , label = 'Testing Loss')
+ax[0].set_title('Training & Testing Loss')
+ax[0].legend()
+ax[0].set_xlabel("Epochs")
+
+ax[1].plot(epochs , train_acc , label = 'Training Accuracy')
+ax[1].plot(epochs , test_acc , label = 'Testing Accuracy')
+ax[1].set_title('Training & Testing Accuracy')
+ax[1].legend()
+ax[1].set_xlabel("Epochs")
+plt.show()
