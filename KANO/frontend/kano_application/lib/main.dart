@@ -5,7 +5,14 @@ import 'package:pie_chart/pie_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'dart:io';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'firebase_options.dart';
 
+// // ...
+
+// await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+// );
 void main() {
   runApp(const MaterialApp(home: Home()));
 }
