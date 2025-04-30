@@ -62,7 +62,8 @@ class _HomeState extends State<Home> {
       showChart = false;
     });
 
-    var url = Uri.parse('https://kanoanalysis.me/predict_simple/');
+    var url = Uri.parse(
+        'https://kano-mood-analysis-870b6bb34a2d.herokuapp.com/predict_simple/');
     var request = http.MultipartRequest('POST', url);
 
     if (file is File) {
