@@ -266,6 +266,10 @@ class _RecordingDetailsScreenState extends State<RecordingDetailsScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.delete, color: Colors.red[300]),
+            onPressed: _confirmDelete,
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
@@ -332,15 +336,19 @@ class _RecordingDetailsScreenState extends State<RecordingDetailsScreen> {
                 decimalPlaces: 0,
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 40),
 
             // Transcript
-            Text(
-              "Transcript",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                "Transcript",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
               ),
             ),
             SizedBox(height: 10),
@@ -362,22 +370,6 @@ class _RecordingDetailsScreenState extends State<RecordingDetailsScreen> {
               ),
             ),
             SizedBox(height: 30),
-            GestureDetector(
-              onTap: _confirmDelete,
-              child: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.red[300],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.delete,
-                  size: 30,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ],
         ),
       ),
