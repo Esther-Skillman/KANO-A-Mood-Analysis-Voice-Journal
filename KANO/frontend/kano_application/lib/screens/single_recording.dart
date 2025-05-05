@@ -335,6 +335,15 @@ class _RecordingDetailsScreenState extends State<RecordingDetailsScreen> {
             SizedBox(height: 30),
 
             // Transcript
+            Text(
+              "Transcript",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 10),
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(16),
