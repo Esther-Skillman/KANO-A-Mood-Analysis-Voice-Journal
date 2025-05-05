@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870025272677",
+    "project_id": "kano-a26a8",
+    "storage_bucket": "kano-a26a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870025272677:android:8d0e622d687459e463558c",
+        "android_client_info": {
+          "package_name": "com.example.kano_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBO63Dv5U2WXaZmmYlHgmGwAcEgVa2GV0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
