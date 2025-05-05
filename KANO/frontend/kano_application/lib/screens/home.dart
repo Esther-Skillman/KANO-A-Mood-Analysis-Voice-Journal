@@ -147,8 +147,6 @@ class _HomeScreenState extends State<HomeScreen> {
       await _recorder.start(
         const RecordConfig(
           encoder: AudioEncoder.wav,
-          bitRate: 128000,
-          sampleRate: 16000,
           numChannels: 1,
         ),
         path: _recordedFilePath!,
