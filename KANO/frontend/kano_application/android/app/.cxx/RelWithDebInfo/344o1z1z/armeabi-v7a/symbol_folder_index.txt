@@ -1,0 +1,1 @@
+C:\Repos\KANO-A-Mood-Analysis-Voice-Journal\KANO\frontend\kano_application\build\app\intermediates\cxx\RelWithDebInfo\344o1z1z\obj\armeabi-v7a

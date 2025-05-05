@@ -1,0 +1,1 @@
+C:\Repos\KANO-A-Mood-Analysis-Voice-Journal\KANO\frontend\kano_application\build\app\intermediates\cxx\Debug\43211g6n\obj\x86_64

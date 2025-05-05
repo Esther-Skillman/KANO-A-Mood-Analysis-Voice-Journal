@@ -1,0 +1,2 @@
+C:/Repos/KANO-A-Mood-Analysis-Voice-Journal/KANO/frontend/kano_application/android/app/.cxx/RelWithDebInfo/72e4o727/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Repos/KANO-A-Mood-Analysis-Voice-Journal/KANO/frontend/kano_application/android/app/.cxx/RelWithDebInfo/72e4o727/arm64-v8a/CMakeFiles/rebuild_cache.dir
