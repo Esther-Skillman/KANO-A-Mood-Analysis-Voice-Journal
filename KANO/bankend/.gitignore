@@ -1,0 +1,20 @@
+# Ignore Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore virtual environment
+.venv/
+
+# Ignore PyCharm project files
+.idea/
+
+# Ignore Juypter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# Ignore system-specific
+.DS_Store   # macOS-specific
+Thumbs.db   # Windows-specifics
+
+# Ignore CNN .keras models
+*.keras
