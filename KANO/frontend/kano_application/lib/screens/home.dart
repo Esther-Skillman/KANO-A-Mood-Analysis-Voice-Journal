@@ -272,46 +272,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_forever, color: Colors.black),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Delete All Recordings'),
-                  content: const Text(
-                      'Are you sure you want to delete all recordings? This action cannot be undone.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        try {
-                          await ApiService.deleteAll();
-                          await _fetchRecordings();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'All recordings deleted successfully')),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content:
-                                    Text('Failed to delete recordings: $e')),
-                          );
-                        }
-                      },
-                      child: const Text('Delete'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(

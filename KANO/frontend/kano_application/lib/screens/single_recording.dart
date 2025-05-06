@@ -336,10 +336,17 @@ class _RecordingDetailsScreenState extends State<RecordingDetailsScreen> {
                 decimalPlaces: 0,
               ),
             ),
-            SizedBox(height: 40),
-
+            SizedBox(height: 10),
+            Text(
+              "*Emotional analysis may not reflect a true representation of the user's mood. User's should be aware this is not clinically validated.",
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontSize: 10,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 30),
             // Transcript
-
             Align(
               alignment: Alignment.center,
               child: Text(
